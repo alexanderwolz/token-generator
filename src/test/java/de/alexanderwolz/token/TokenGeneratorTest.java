@@ -1,7 +1,6 @@
 package de.alexanderwolz.token;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -15,7 +14,7 @@ public class TokenGeneratorTest {
     //openssl pkcs8 -in private.pem -topk8 -nocrypt -out private-pkcs8.pem
     //First key is PKCS1 but Java only knows PKCS8, so we need to create one using OpenSSL
 
-    private static String privateKeyPkcs8String = "-----BEGIN PRIVATE KEY-----\n" +
+    private static final String privateKeyPkcs8String = "-----BEGIN PRIVATE KEY-----\n" +
             "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDqqjmYQVspXqJr\n" +
             "7XLxNRKgffw0TG8Tt7JqAFsPUGQzpb/7DMGqW1O7RYPyg5QPPfCdEX1qEEBZFVpw\n" +
             "Bh8dBISgsnvmZXLT6IZOEfCDWgv9lDnUWpMr4awZ6b+674Rxl2OMiwUo5Uerksnd\n" +
@@ -44,7 +43,7 @@ public class TokenGeneratorTest {
             "/9iHbq5BkbD6Aw7VFUV4e4o=\n" +
             "-----END PRIVATE KEY-----\n";
 
-    private static String publicKeyX509String = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String publicKeyX509String = "-----BEGIN PUBLIC KEY-----\n" +
             "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6qo5mEFbKV6ia+1y8TUS\n" +
             "oH38NExvE7eyagBbD1BkM6W/+wzBqltTu0WD8oOUDz3wnRF9ahBAWRVacAYfHQSE\n" +
             "oLJ75mVy0+iGThHwg1oL/ZQ51FqTK+GsGem/uu+EcZdjjIsFKOVHq5LJ3bTi3JZU\n" +
