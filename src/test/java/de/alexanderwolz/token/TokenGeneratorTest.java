@@ -1,11 +1,11 @@
 package de.alexanderwolz.token;
 
-import de.alexanderwolz.token.TokenGenerator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.security.spec.*;
-import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TokenGeneratorTest {
 
@@ -53,33 +53,34 @@ public class TokenGeneratorTest {
             "DQIDAQAB\n" +
             "-----END PUBLIC KEY-----";
 
-    public static void main(String[] args) throws Exception {
-        PrivateKey privateKey = TokenGenerator.getPrivateKey_PKCS8(privateKeyPkcs8String);
-        PublicKey publicKey = TokenGenerator.getPublicKey_X509(publicKeyX509String);
-        String token = TokenGenerator.createJwt_RS256(privateKey, "issuer", "subject", "audience", 500);
+    @Test
+    public void testCreateJwtWithStringParams() throws Exception {
+        String issuer = "https://sso.myserver.com";
+        String subject = "john.doe@myserver.com";
+        String audience = "https://resources.myserver.com";
+        int expiresIn = 500;
+        String token = TokenGenerator.createJwt_RS256(issuer, subject, audience, expiresIn, privateKeyPkcs8String);
         System.out.println(token);
-        verify(token, publicKey);
+        boolean isValid = TokenGenerator.verifyJwt_RS256(token, publicKeyX509String);
+        System.out.println("Token is valid: " + isValid);
+        Assertions.assertTrue(isValid);
     }
 
-    private static void verify(String token, PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
-        System.out.println("Verifying ..");
-        Base64.Decoder decoder = Base64.getUrlDecoder();
-        String[] parts = token.split("\\.");
-        String header64 = parts[0];
-        String payload64 = parts[1];
-        String signature64 = parts[2];
+    @Test
+    public void testCreateJwtWithMapParams() throws Exception {
+        Map<String, String> header = new HashMap<>();
+        header.put("alg", "rsa256");
+        header.put("typ", "JWT");
 
-        System.out.println("Header: " + new String(decoder.decode(header64), StandardCharsets.UTF_8));
-        System.out.println("Payload: " + new String(decoder.decode(payload64), StandardCharsets.UTF_8));
+        Map<String, String> payload = new HashMap<>();
+        payload.put("iss", "jan");
+        payload.put("aud", "jan.wistuba-it.frontpage.com");
 
-        String hashData = header64 + "." + payload64;
-        byte[] hash = MessageDigest.getInstance("SHA-256").digest(hashData.getBytes(StandardCharsets.UTF_8));
-
-        Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initVerify(publicKey);
-        signature.update(hash);
-        boolean isValid = signature.verify(decoder.decode(signature64));
+        String token = TokenGenerator.createJwt_RS256(header, payload, privateKeyPkcs8String);
+        System.out.println(token);
+        boolean isValid = TokenGenerator.verifyJwt_RS256(token, publicKeyX509String);
         System.out.println("Token is valid: " + isValid);
+        Assertions.assertTrue(isValid);
     }
 
 }
