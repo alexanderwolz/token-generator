@@ -1,3 +1,5 @@
+package de.alexanderwolz.token;
+
 import de.alexanderwolz.token.TokenGenerator;
 
 import java.nio.charset.StandardCharsets;
