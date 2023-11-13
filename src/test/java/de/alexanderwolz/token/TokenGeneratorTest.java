@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,8 +74,10 @@ public class TokenGeneratorTest {
         header.put("typ", "JWT");
 
         Map<String, String> payload = new HashMap<>();
-        payload.put("iss", "jan");
-        payload.put("aud", "jan.wistuba-it.frontpage.com");
+        payload.put("iss", "https://sso.myserver.com");
+        payload.put("sub", "john.doe@myserver.com");
+        payload.put("aud", "https://resources.myserver.com");
+        payload.put("exp", String.valueOf(new Date().getTime() / 1000));
 
         String token = TokenGenerator.createJwt_RS256(header, payload, privateKeyPkcs8String);
         System.out.println(token);
