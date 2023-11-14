@@ -12,11 +12,11 @@ import java.util.Map;
 
 public class TokenGenerator {
 
-    public static String createJwt_RS256(Map<String, String> headerMap, Map<String, String> payloadMap, String privateKeyPKCS8) throws Exception {
-        return createJwt_RS256(createJson(headerMap), createJson(payloadMap), privateKeyPKCS8);
+    public static String createJwt(Map<String, String> headerMap, Map<String, String> payloadMap, String privateKeyPKCS8) throws NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, InvalidKeyException {
+        return createJwt(createJson(headerMap), createJson(payloadMap), privateKeyPKCS8);
     }
 
-    public static String createJwt_RS256(String headerJson, String payloadJson, String privateKeyPKCS8) throws Exception {
+    public static String createJwt(String headerJson, String payloadJson, String privateKeyPKCS8) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
 
         Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
         String header64 = encoder.encodeToString(headerJson.getBytes(StandardCharsets.UTF_8));
@@ -25,7 +25,6 @@ public class TokenGenerator {
         String hashData = header64 + "." + payload64;
         byte[] hash = MessageDigest.getInstance("SHA-256").digest(hashData.getBytes(StandardCharsets.UTF_8));
 
-        //RSASHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload))
         Signature signature = Signature.getInstance("SHA256WithRSA");
         signature.initSign(getPrivateKey_PKCS8(privateKeyPKCS8));
         signature.update(hash);
@@ -35,7 +34,7 @@ public class TokenGenerator {
     }
 
 
-    public static String createJwt_RS256(String issuer, String subject, String audience, int expiresInSeconds, String privateKeyPKCS8) throws Exception {
+    public static String createJwt_RS256(String issuer, String subject, String audience, int expiresInSeconds, String privateKeyPKCS8) throws NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, InvalidKeyException {
 
         long nowInSeconds = new Date().getTime() / 1000;
         long expiration = nowInSeconds + expiresInSeconds; //adds threshold
@@ -54,7 +53,7 @@ public class TokenGenerator {
                 "\"exp\":\"" + expiration + "\"" +
                 "}";
 
-        return createJwt_RS256(header, payload, privateKeyPKCS8);
+        return createJwt(header, payload, privateKeyPKCS8);
     }
 
     public static boolean verifyJwt_RS256(String jwt, String publicKeyX509) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
