@@ -3,6 +3,8 @@ package de.alexanderwolz.token;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +63,7 @@ public class TokenGeneratorTest {
         int expiresIn = 500;
         String token = TokenGenerator.createJwt_RS256(issuer, subject, audience, expiresIn, privateKeyPkcs8String);
         System.out.println(token);
+        printDecodedTokenParts(token);
         boolean isValid = TokenGenerator.verifyJwt_RS256(token, publicKeyX509String);
         System.out.println("Token is valid: " + isValid);
         Assertions.assertTrue(isValid);
@@ -80,9 +83,17 @@ public class TokenGeneratorTest {
 
         String token = TokenGenerator.createJwt_RS256(header, payload, privateKeyPkcs8String);
         System.out.println(token);
+        printDecodedTokenParts(token);
         boolean isValid = TokenGenerator.verifyJwt_RS256(token, publicKeyX509String);
         System.out.println("Token is valid: " + isValid);
         Assertions.assertTrue(isValid);
+    }
+
+    private void printDecodedTokenParts(String token) {
+        String[] parts = token.split("\\.");
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        System.out.println("Header: " + new String(decoder.decode(parts[0]), StandardCharsets.UTF_8));
+        System.out.println("Payload: " + new String(decoder.decode(parts[1]), StandardCharsets.UTF_8));
     }
 
 }

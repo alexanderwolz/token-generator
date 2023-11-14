@@ -58,15 +58,11 @@ public class TokenGenerator {
     }
 
     public static boolean verifyJwt_RS256(String jwt, String publicKeyX509) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
-        System.out.println("Verifying ..");
         Base64.Decoder decoder = Base64.getUrlDecoder();
         String[] parts = jwt.split("\\.");
         String header64 = parts[0];
         String payload64 = parts[1];
         String signature64 = parts[2];
-
-        System.out.println("Header: " + new String(decoder.decode(header64), StandardCharsets.UTF_8));
-        System.out.println("Payload: " + new String(decoder.decode(payload64), StandardCharsets.UTF_8));
 
         String hashData = header64 + "." + payload64;
         byte[] hash = MessageDigest.getInstance("SHA-256").digest(hashData.getBytes(StandardCharsets.UTF_8));
