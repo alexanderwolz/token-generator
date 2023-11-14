@@ -1,0 +1,10 @@
+package de.alexanderwolz.token;
+
+import java.io.File;
+
+public abstract class AbstractTest {
+    protected final String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Nzby5teXNlcnZlci5jb20iLCJzdWIiOiJqb2huLmRvZUBteXNlcnZlci5jb20iLCJhdWQiOiJodHRwczovL3Jlc291cmNlcy5teXNlcnZlci5jb20iLCJpYXQiOiIxNjk5OTQ5OTMxIiwibmJmIjoiMTY5OTk0OTkzMSIsImV4cCI6IjE2OTk5NTA0MzEifQ.SePhL73TdqDXi3mnMuG8znugyl5-W1wQgXccRXRgFjEgOsaQeWFlOsWGkj35S_4cjZmnCGIj2mo_r-VeTl0a4A4mvP7wm8mY0qScw04DcISTBcmW1F4gZmTVPp1yx1GKIxbyUJbvWv0wyjjpBarOU_CYasiCq_r7NmXIVADO7VA8CUfljA2huGBrJvYf-FWY1WtMQHEp2D51Eo55PhGM2vlAZTrK4BM4gSbApqiRxT42tMDL3dLoBijBHIbrsRNOMJUL-zQRluQTgwWlSDD51_7Z9fN2vjb-BY_JRCQF5pYDHVkdY4WoOx-sni9KoGhVE5uIa-tcK0vNdbe03nUfIQ";
+    protected final String publicKeyX509File = new File("src/test/resources/public.pem").getAbsolutePath();
+    protected final String privateKeyPkcs8File = new File("src/test/resources/private-pkcs8.pem").getAbsolutePath();
+
+}
