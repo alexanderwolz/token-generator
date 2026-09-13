@@ -11,11 +11,11 @@ This repository provides a toolkit to create JWT tokens
 
 ## 🛠️ Build
 1. Create jar resource using ```./gradlew clean build```
-2. Execute jar using ```java -jar build/libs/token-generator-1.2.jar```
+2. Execute jar using ```java -jar build/libs/token-generator-1.3.jar```
 
 ## ⚙️ Example
-1. Create RS256 tokens: ```java -jar build/libs/token-generator-1.2.jar -c privateKey issuer subject audience expirationInSeconds```
-2. Validate tokens: ```java -jar build/libs/token-generator-1.2.jar -v publicKey token```
+1. Create RS256 tokens: ```java -jar build/libs/token-generator-1.3.jar -c privateKey issuer subject audience expirationInSeconds```
+2. Validate tokens: ```java -jar build/libs/token-generator-1.3.jar -v publicKey token```
 - - -
 
 Made with ❤️ in Bavaria

@@ -79,12 +79,69 @@ public class TokenGenerator {
 
 
     private static PrivateKey getPrivateKey_PKCS8(String rsaPrivateKey) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        String key = readContent(rsaPrivateKey);
-        key = key.replace("-----BEGIN PRIVATE KEY-----", "");
-        key = key.replace("-----END PRIVATE KEY-----", "");
-        key = key.replaceAll("\\s+", "");
-        KeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(key));
+        String content = readContent(rsaPrivateKey);
+
+        if (content.contains("BEGIN RSA PRIVATE KEY")) {
+            byte[] pkcs1Bytes = decodePem(content, "RSA PRIVATE KEY");
+            byte[] pkcs8Bytes = wrapRsaPkcs1InPkcs8(pkcs1Bytes);
+            KeySpec keySpec = new PKCS8EncodedKeySpec(pkcs8Bytes);
+            return KeyFactory.getInstance("RSA").generatePrivate(keySpec);
+        }
+
+        byte[] pkcs8Bytes = decodePem(content, "PRIVATE KEY");
+        KeySpec keySpec = new PKCS8EncodedKeySpec(pkcs8Bytes);
         return KeyFactory.getInstance("RSA").generatePrivate(keySpec);
+    }
+
+    private static byte[] decodePem(String content, String label) {
+        String key = content
+                .replace("-----BEGIN " + label + "-----", "")
+                .replace("-----END " + label + "-----", "")
+                .replaceAll("\\s+", "");
+        return Base64.getDecoder().decode(key);
+    }
+
+    private static byte[] wrapRsaPkcs1InPkcs8(byte[] pkcs1) {
+        byte[] version = {0x02, 0x01, 0x00}; // INTEGER 0
+        byte[] rsaAlgorithmIdentifier = { // SEQUENCE { OID rsaEncryption, NULL }
+                0x30, 0x0D,
+                0x06, 0x09, 0x2A, (byte) 0x86, 0x48, (byte) 0x86, (byte) 0xF7, 0x0D, 0x01, 0x01, 0x01,
+                0x05, 0x00
+        };
+        byte[] privateKeyOctetString = concat(new byte[]{0x04}, derLength(pkcs1.length), pkcs1);
+        byte[] body = concat(version, rsaAlgorithmIdentifier, privateKeyOctetString);
+        return concat(new byte[]{0x30}, derLength(body.length), body);
+    }
+
+    private static byte[] derLength(int length) {
+        if (length < 0x80) {
+            return new byte[]{(byte) length};
+        }
+        int numBytes = 1;
+        for (int temp = length; (temp >>= 8) != 0; numBytes++) {
+            // count how many bytes are needed to represent the length
+        }
+        byte[] result = new byte[numBytes + 1];
+        result[0] = (byte) (0x80 | numBytes);
+        for (int i = numBytes; i >= 1; i--) {
+            result[i] = (byte) (length & 0xFF);
+            length >>= 8;
+        }
+        return result;
+    }
+
+    private static byte[] concat(byte[]... arrays) {
+        int total = 0;
+        for (byte[] array : arrays) {
+            total += array.length;
+        }
+        byte[] result = new byte[total];
+        int offset = 0;
+        for (byte[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
+        }
+        return result;
     }
 
     private static PublicKey getPublicKey_X509(String x509Key) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {

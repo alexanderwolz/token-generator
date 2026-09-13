@@ -51,6 +51,20 @@ public class TokenGeneratorTest extends AbstractTest {
     }
 
     @Test
+    public void testCreateJwtWithPkcs1PrivateKey() throws Exception {
+        // Regression test: openssl genrsa produces PKCS#1 ("BEGIN RSA PRIVATE KEY"),
+        // which used to fail with a cryptic "Illegal base64 character 2d" because
+        // the leftover "-----" markers of the unmatched PEM header were fed
+        // straight into the Base64 decoder. private.pem and private-pkcs8.pem are
+        // the same underlying key pair in different encodings (see
+        // src/test/resources/Readme.txt), so this must verify against the same
+        // public key as the PKCS#8 tests above.
+        String token = TokenGenerator.createJwt_RS256("issuer", "subject", "audience", 500, privateKeyPkcs1File);
+        boolean isValid = TokenGenerator.verifyJwt_RS256(token, publicKeyX509File);
+        Assertions.assertTrue(isValid);
+    }
+
+    @Test
     public void testExpirationClaimsAreNumericNotStrings() throws Exception {
         // RFC 7519 requires iat/nbf/exp to be JSON numbers (NumericDate), not strings.
         String token = TokenGenerator.createJwt_RS256("issuer", "subject", "audience", 500, privateKeyPkcs8File);
