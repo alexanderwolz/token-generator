@@ -26,15 +26,14 @@ public class TokenGenerator {
         String header64 = encoder.encodeToString(headerJson.getBytes(StandardCharsets.UTF_8));
         String payload64 = encoder.encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
 
-        String hashData = header64 + "." + payload64;
-        byte[] hash = MessageDigest.getInstance("SHA-256").digest(hashData.getBytes(StandardCharsets.UTF_8));
+        String signingInput = header64 + "." + payload64;
 
-        Signature signature = Signature.getInstance("SHA256WithRSA");
+        Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(getPrivateKey_PKCS8(privateKeyPKCS8));
-        signature.update(hash);
+        signature.update(signingInput.getBytes(StandardCharsets.UTF_8));
         String signature64 = encoder.encodeToString(signature.sign());
 
-        return hashData + "." + signature64;
+        return signingInput + "." + signature64;
     }
 
 
@@ -52,9 +51,9 @@ public class TokenGenerator {
                 "\"iss\":\"" + issuer + "\"," +
                 "\"sub\":\"" + subject + "\"," +
                 "\"aud\":\"" + audience + "\"," +
-                "\"iat\":\"" + nowInSeconds + "\"," +
-                "\"nbf\":\"" + nowInSeconds + "\"," +
-                "\"exp\":\"" + expiration + "\"" +
+                "\"iat\":" + nowInSeconds + "," +
+                "\"nbf\":" + nowInSeconds + "," +
+                "\"exp\":" + expiration +
                 "}";
 
         return createJwt(header, payload, privateKeyPKCS8);
@@ -70,12 +69,11 @@ public class TokenGenerator {
         String payload64 = parts[1];
         String signature64 = parts[2];
 
-        String hashData = header64 + "." + payload64;
-        byte[] hash = MessageDigest.getInstance("SHA-256").digest(hashData.getBytes(StandardCharsets.UTF_8));
+        String signingInput = header64 + "." + payload64;
 
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initVerify(getPublicKey_X509(publicKeyX509));
-        signature.update(hash);
+        signature.update(signingInput.getBytes(StandardCharsets.UTF_8));
         return signature.verify(decoder.decode(signature64));
     }
 
